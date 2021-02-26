@@ -67,13 +67,29 @@ def generate_occ_mask_map(args,split_folder = 'TRAIN'):
     
 
 def generate_occ_mask_map_for_others(args,sub_dir = 'Monkaa'):
+    assert sub_dir== 'Monkaa' or sub_dir == 'driving'
 
     DIR = os.path.join(args.DATA_PATH,sub_dir)
     directory = os.path.join(DIR,'frames_cleanpass')
-    #A,B,C
-    sub_folders = [os.path.join(directory, subset) for subset in os.listdir(directory) if
-                       os.path.isdir(os.path.join(directory, subset))]
-
+    if sub_dir == 'Monkaa':
+        #different scens for monkaa
+        sub_folders = [os.path.join(directory, subset) for subset in os.listdir(directory) if
+                        os.path.isdir(os.path.join(directory, subset))]
+    else:
+        #different focal_length 
+        sub_folders_1 = [os.path.join(directory, subset) for subset in os.listdir(directory) if
+                        os.path.isdir(os.path.join(directory, subset))]
+        #backwards or forwards
+        sub_folders_2 = []
+        for i in sub_folders_1:
+            sub_folders_2 += [os.path.join(i, subset) for subset in os.listdir(i) if
+                        os.path.isdir(os.path.join(i, subset))]
+        
+        sub_folders = []
+        for i in sub_folders_2:
+            sub_folders += [os.path.join(i, subset) for subset in os.listdir(i) if
+                        os.path.isdir(os.path.join(i, subset))] 
+        print(sub_folders[0])    
     left_data = []
     for sub_folder in sub_folders:
         left_data += [os.path.join(sub_folder, 'left', img) for img in
@@ -110,13 +126,14 @@ def generate_occ_mask_map_for_others(args,sub_dir = 'Monkaa'):
         cv2.imwrite(occ_right_name,right_occ)
         print(" rate of advance : {} / {}    {} % ".format(Count+1,img_num,Count/img_num*100))
         Count += 1
+    
 
 def main():
-    generate_occ_mask_map(split_folder='TRAIN',args)
-    generate_occ_mask_map(split_folder='TEST',args)
+    #generate_occ_mask_map(split_folder='TRAIN',args)
+    #generate_occ_mask_map(split_folder='TEST',args)
     if(args.all_dataset):
-        generate_occ_mask_map_for_others(args,'Monkaa')
-        generate_occ_mask_map_for_others(args,'Driving')
+        #generate_occ_mask_map_for_others(args,'Monkaa')
+        generate_occ_mask_map_for_others(args,'driving')
     
 
 
